@@ -11,8 +11,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { ChevronLeft, ChevronRight, User, Briefcase, Award, Check, Plus, Trash2, Loader2 } from 'lucide-react'
+import { ChevronLeft, ChevronRight, User, Briefcase, Award, Check, Plus, Trash2, Loader2, VideoIcon } from 'lucide-react'
 import { useCandidates } from '@/hooks/useCandidates'
+import { VideoRecorder } from '@/components/videoRecorded'
 import { toast } from 'sonner'
 
 // Form validation schemas for each step
@@ -68,7 +69,8 @@ type FormData = PersonalInfo & Experience & Skills
 const STEPS = [
   { id: 1, title: 'Personal Information', icon: User },
   { id: 2, title: 'Experience', icon: Briefcase },
-  { id: 3, title: 'Skills & Projects', icon: Award }
+  { id: 3, title: 'Skills & Projects', icon: Award },
+  { id: 4, title: 'Video Interview', icon: VideoIcon }
 ]
 
 export default function Register() {
@@ -85,6 +87,8 @@ export default function Register() {
     }]
   })
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [candidateId, setCandidateId] = useState<string | null>(null)
+  const [videoCompleted, setVideoCompleted] = useState(false)
 
   const { loading, error, registerCandidate } = useCandidates()
 
@@ -93,6 +97,7 @@ export default function Register() {
       case 1: return personalInfoSchema
       case 2: return experienceSchema
       case 3: return skillsSchema
+      case 4: return z.object({}) // No validation for video step
       default: return personalInfoSchema
     }
   }
@@ -135,19 +140,30 @@ export default function Register() {
       if (currentStep < 3) {
         setCurrentStep(prev => prev + 1)
         form.reset(updatedFormData)
-      } else {
-        // Final submission
+      } else if (currentStep === 3) {
+        // Register candidate and move to video step
         const result = await registerCandidate(updatedFormData as any)
         
         if (result.success) {
-          setIsSubmitted(true)
-          toast.success('Registration completed successfully!', {
-            description: 'We will review your application and get back to you soon.'
+          setCandidateId(result.candidateId)
+          setCurrentStep(4)
+          toast.success('Profile registered successfully!', {
+            description: 'Now complete your application with a video response.'
           })
         } else {
           toast.error('Registration failed', {
             description: result.error || 'Please try again later.'
           })
+        }
+      } else if (currentStep === 4) {
+        // Video step - only proceed if video is completed
+        if (videoCompleted) {
+          setIsSubmitted(true)
+          toast.success('Registration completed successfully!', {
+            description: 'We will review your application and get back to you soon.'
+          })
+        } else {
+          toast.error('Please complete your video response to finish registration.')
         }
       }
     }
@@ -160,7 +176,7 @@ export default function Register() {
     }
   }
 
-  const progress = (currentStep / 3) * 100
+  const progress = (currentStep / 4) * 100
 
   // Success screen
   if (isSubmitted) {
@@ -207,7 +223,7 @@ export default function Register() {
               <div className="bg-white rounded-lg p-6 shadow-sm border">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-semibold text-slate-900">Registration Progress</h3>
-                  <span className="text-sm text-slate-500">{currentStep} of 3</span>
+                  <span className="text-sm text-slate-500">{currentStep} of 4</span>
                 </div>
                 <Progress value={progress} className="mb-4" />
                 <div className="flex justify-between text-sm">
@@ -841,13 +857,56 @@ export default function Register() {
                       </div>
                     )}
 
+                    {/* Step 4: Video Interview */}
+                    {currentStep === 4 && (
+                      <div className="space-y-6 text-center">
+                        <div className="space-y-4">
+                          <h3 className="text-xl font-semibold">Video Entrevista</h3>
+                          <p className="text-gray-600">
+                            Como último paso, nos gustaría conocerte mejor a través de una breve respuesta en video.
+                            Te mostraremos una pregunta y tendrás 40 segundos para pensar tu respuesta, 
+                            luego se grabará automáticamente durante 40 segundos.
+                          </p>
+                          
+                          <div className="bg-blue-50 p-4 rounded-lg border">
+                            <h4 className="font-medium text-blue-900 mb-2">¿Cómo funciona?</h4>
+                            <ol className="text-sm text-blue-800 space-y-1 text-left max-w-md mx-auto">
+                              <li>1. Haz clic en "Grabar Video Respuesta"</li>
+                              <li>2. Te mostraremos una pregunta aleatoria</li>
+                              <li>3. Tendrás 40 segundos para pensar</li>
+                              <li>4. La grabación iniciará automáticamente por 40 segundos</li>
+                              <li>5. Podrás revisar y guardar tu respuesta</li>
+                            </ol>
+                          </div>
+
+                          {videoCompleted && (
+                            <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                              <div className="flex items-center justify-center space-x-2 text-green-800">
+                                <Check className="w-5 h-5" />
+                                <span className="font-medium">¡Video respuesta completada!</span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        <VideoRecorder 
+                          candidateId={candidateId || undefined}
+                          onVideoSaved={(videoData) => {
+                            console.log('Video guardado:', videoData)
+                            setVideoCompleted(true)
+                            toast.success('¡Video guardado exitosamente!')
+                          }}
+                        />
+                      </div>
+                    )}
+
                     {/* Navigation Buttons */}
                     <div className="flex justify-between pt-6 border-t">
                       <Button 
                         type="button" 
                         variant="outline" 
                         onClick={onPrevious}
-                        disabled={currentStep === 1 || loading}
+                        disabled={(currentStep === 1) || loading}
                         className="flex items-center space-x-2 hover:bg-black text-black hover:text-white bg-white"
                       >
                         <ChevronLeft size={16} />
@@ -856,11 +915,14 @@ export default function Register() {
                       
                       <Button 
                         type="submit"
-                        disabled={loading}
+                        disabled={loading || (currentStep === 4 && !videoCompleted)}
                         className="flex items-center space-x-2"
                       >
                         {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-                        <span>{currentStep === 3 ? 'Complete Registration' : 'Next'}</span>
+                        <span>
+                          {currentStep === 4 ? 'Complete Registration' : 
+                           currentStep === 3 ? 'Continue to Video' : 'Next'}
+                        </span>
                         {currentStep < 3 && !loading && <ChevronRight size={16} />}
                       </Button>
                     </div>
