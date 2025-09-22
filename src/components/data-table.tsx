@@ -1,4 +1,5 @@
 import * as React from "react"
+import router, { useRouter } from "next/router"
 import {
   closestCenter,
   DndContext,
@@ -275,7 +276,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-32">
             <DropdownMenuItem>Contact</DropdownMenuItem>
-            <DropdownMenuItem>Schedule Interview</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push(`/admin/candidates/${row.id}`)}>Go to Details</DropdownMenuItem>
             <DropdownMenuItem>Mark as Hired</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem variant="destructive">Remove</DropdownMenuItem>
@@ -624,7 +625,7 @@ const chartConfig = {
 
 function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
   const isMobile = useIsMobile()
-
+  const router = useRouter()
   return (
     <Drawer direction={isMobile ? "bottom" : "right"}>
       <DrawerTrigger asChild>
@@ -737,8 +738,8 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
               <IconMail className="size-4 mr-2" />
               Contact
             </Button>
-            <Button variant="outline" className="flex-1 border-gray-300 text-black hover:bg-gray-50">
-              Schedule Interview
+            <Button onClick={() => router.push(`/admin/candidates/${item.id}`)} variant="outline" className="flex-1 border-gray-300 text-black hover:bg-gray-50">
+              Go to Details
             </Button>
           </div>
           <DrawerClose asChild>

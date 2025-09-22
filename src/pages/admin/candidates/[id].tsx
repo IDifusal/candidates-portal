@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/router"
+import Head from "next/head"
 import { AppSidebar } from "@/components/app-sidebar"
 import { SiteHeader } from "@/components/site-header"
 import { FloatingChat } from "@/components/floating-chat"
+import { AuthGuard } from "@/components/auth/auth-guard"
 import {
   SidebarInset,
   SidebarProvider,
@@ -12,6 +14,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { AdminChat } from "@/components/admin-chat"
 import { IconLoader, IconArrowLeft } from "@tabler/icons-react"
 import { 
   MapPin, 
@@ -66,7 +69,7 @@ interface WorkExperience {
   industry: string | null
 }
 
-export default function CandidateDetail() {
+function CandidateDetailContent() {
   const router = useRouter()
   const { id } = router.query
   const [candidate, setCandidate] = useState<CandidateData | null>(null)
@@ -191,7 +194,7 @@ export default function CandidateDetail() {
             <div className="@container/main flex flex-1 flex-col gap-4 bg-background p-4 md:p-6">
               
               {/* Header with Back Button */}
-              <div className="flex items-center gap-4">
+              <div className="">
                 <Button 
                   variant="outline" 
                   size="sm"
@@ -201,7 +204,7 @@ export default function CandidateDetail() {
                   <IconArrowLeft className="w-4 h-4" />
                   Back to Candidates
                 </Button>
-                <div>
+                <div className="mt-4">
                   <h1 className="text-2xl font-bold">Candidate Profile</h1>
                   <p className="text-muted-foreground">
                     Registered on {formatDate(candidate.created_at)}
@@ -213,6 +216,13 @@ export default function CandidateDetail() {
                 
                 {/* Left Column - Main Info */}
                 <div className="lg:col-span-2 space-y-6">
+                  
+                  {/* Chat Section */}
+                  <AdminChat
+                    candidateId={candidate.id}
+                    candidateName={`${candidate.first_name} ${candidate.last_name}`}
+                    candidateEmail={candidate.email}
+                  />
                   
                   {/* Personal Information Card */}
                   <Card>
@@ -439,5 +449,13 @@ export default function CandidateDetail() {
         <FloatingChat onNavigate={handleNavigation} />
       </SidebarProvider>
     </div>
+  )
+}
+
+export default function CandidateDetail() {
+  return (
+    <AuthGuard requireAuth={true}>
+      <CandidateDetailContent />
+    </AuthGuard>
   )
 }

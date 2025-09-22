@@ -31,11 +31,14 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 
-const data = {
+import { useCurrentUser } from "@/components/auth/auth-guard"
+
+// This data will be populated inside the component
+const defaultData = {
   user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
+    name: "",
+    email: "",
+    avatar: "https://ui-avatars.com/api/?name=User",
   },
   navMain: [
     {
@@ -149,6 +152,17 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user } = useCurrentUser()
+  
+  const data = {
+    ...defaultData,
+    user: {
+      name: user?.name?.substring(0, 20) + "..." || "Admin",
+      email: user?.email || "admin@company.com",
+      avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || "Admin")}`,
+    }
+  }
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -160,7 +174,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             >
               <a href="#">
                 <IconInnerShadowTop className="!size-5" />
-                <span className="text-base font-semibold">Acme Inc.</span>
+                <span className="text-base font-semibold">Candidates Portal</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>

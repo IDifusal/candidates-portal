@@ -124,6 +124,85 @@ export interface Database {
           industry?: string | null
         }
       }
+      chat_conversations: {
+        Row: {
+          id: string
+          candidate_id: string
+          admin_user_id: string
+          status: 'active' | 'closed' | 'archived'
+          created_at: string
+          updated_at: string
+          last_message_at: string | null
+          talent_token: string
+          token_expires_at: string
+          opportunity_type: 'direct_hire' | 'project' | 'consultation' | 'collaboration'
+          urgency: 'immediate' | 'flexible' | 'future'
+          engagement_type: 'full_time' | 'part_time' | 'contract' | 'freelance'
+        }
+        Insert: {
+          id?: string
+          candidate_id: string
+          admin_user_id: string
+          status?: 'active' | 'closed' | 'archived'
+          created_at?: string
+          updated_at?: string
+          last_message_at?: string | null
+          talent_token?: string
+          token_expires_at?: string
+          opportunity_type?: 'direct_hire' | 'project' | 'consultation' | 'collaboration'
+          urgency?: 'immediate' | 'flexible' | 'future'
+          engagement_type?: 'full_time' | 'part_time' | 'contract' | 'freelance'
+        }
+        Update: {
+          id?: string
+          candidate_id?: string
+          admin_user_id?: string
+          status?: 'active' | 'closed' | 'archived'
+          created_at?: string
+          updated_at?: string
+          last_message_at?: string | null
+          talent_token?: string
+          token_expires_at?: string
+          opportunity_type?: 'direct_hire' | 'project' | 'consultation' | 'collaboration'
+          urgency?: 'immediate' | 'flexible' | 'future'
+          engagement_type?: 'full_time' | 'part_time' | 'contract' | 'freelance'
+        }
+      }
+      chat_messages: {
+        Row: {
+          id: string
+          conversation_id: string
+          sender_type: 'admin' | 'candidate'
+          sender_id: string
+          content: string
+          message_type: 'text' | 'file' | 'system'
+          read_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          conversation_id: string
+          sender_type: 'admin' | 'candidate'
+          sender_id: string
+          content: string
+          message_type?: 'text' | 'file' | 'system'
+          read_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          conversation_id?: string
+          sender_type?: 'admin' | 'candidate'
+          sender_id?: string
+          content?: string
+          message_type?: 'text' | 'file' | 'system'
+          read_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never

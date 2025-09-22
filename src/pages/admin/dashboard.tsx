@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/router"
+import Head from "next/head"
 import { AppSidebar } from "@/components/app-sidebar"
 import { ChartAreaInteractive } from "@/components/chart-area-interactive"
 import { DataTable } from "@/components/data-table"
 import { SectionCards } from "@/components/section-cards"
 import { SiteHeader } from "@/components/site-header"
 import { FloatingChat } from "@/components/floating-chat"
+import { AuthGuard } from "@/components/auth/auth-guard"
 import {
   SidebarInset,
   SidebarProvider,
@@ -14,7 +16,7 @@ import { useCandidates } from "@/hooks/useCandidates"
 import { IconLoader } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
 
-export default function Page() {
+function DashboardPage() {
   const router = useRouter()
   const { candidates, loading, error, fetchCandidates } = useCandidates()
   const [filteredCandidates, setFilteredCandidates] = useState<any[]>([])
@@ -117,72 +119,87 @@ export default function Page() {
   }
 
   return (
-    <div className="dark">
-      <SidebarProvider
-        style={
-          {
-            "--sidebar-width": "calc(var(--spacing) * 72)",
-            "--header-height": "calc(var(--spacing) * 12)",
-          } as React.CSSProperties
-        }
-      >
-        <AppSidebar variant="inset" />
-        <SidebarInset className="bg-background">
-          <SiteHeader />
-          <div className="flex flex-1 flex-col bg-background">
-            <div className="@container/main flex flex-1 flex-col gap-2 bg-background">
-              <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 bg-background">
-                {searchQuery && (
-                  <div className="px-4 lg:px-6">
-                    <div className={cn(
-                      "border rounded-lg p-4",
-                      displayCandidates.length > 0 
-                        ? "bg-blue-50 border-blue-200" 
-                        : "bg-yellow-50 border-yellow-200"
-                    )}>
-                      <h3 className={cn(
-                        "font-semibold mb-1",
-                        displayCandidates.length > 0 ? "text-blue-900" : "text-yellow-900"
+    <>
+      <Head>
+        <title>Admin Dashboard - Candidates Portal</title>
+        <meta name="description" content="Manage candidates and view analytics" />
+      </Head>
+      
+      <div className="dark">
+        <SidebarProvider
+          style={
+            {
+              "--sidebar-width": "calc(var(--spacing) * 72)",
+              "--header-height": "calc(var(--spacing) * 12)",
+            } as React.CSSProperties
+          }
+        >
+          <AppSidebar variant="inset" />
+          <SidebarInset className="bg-background">
+            <SiteHeader />
+            <div className="flex flex-1 flex-col bg-background">
+              <div className="@container/main flex flex-1 flex-col gap-2 bg-background">
+                <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 bg-background">
+                  {searchQuery && (
+                    <div className="px-4 lg:px-6">
+                      <div className={cn(
+                        "border rounded-lg p-4",
+                        displayCandidates.length > 0 
+                          ? "bg-blue-50 border-blue-200" 
+                          : "bg-yellow-50 border-yellow-200"
                       )}>
-                        {displayCandidates.length > 0 ? "Search Results" : "No Results Found"}
-                      </h3>
-                      <p className={cn(
-                        "text-sm",
-                        displayCandidates.length > 0 ? "text-blue-700" : "text-yellow-700"
-                      )}>
-                        {displayCandidates.length > 0 
-                          ? `Showing results for: "${searchQuery}" (${displayCandidates.length} candidate${displayCandidates.length !== 1 ? 's' : ''} found)`
-                          : `No candidates found for: "${searchQuery}". Try adjusting your search criteria.`
-                        }
-                      </p>
-                      <button
-                        onClick={() => {
-                          router.push('/admin/dashboard')
-                          setSearchQuery('')
-                        }}
-                        className={cn(
-                          "text-xs hover:underline mt-2 underline",
-                          displayCandidates.length > 0 
-                            ? "text-blue-600 hover:text-blue-800" 
-                            : "text-yellow-600 hover:text-yellow-800"
-                        )}
-                      >
-                        Clear search and show all candidates
-                      </button>
+                        <h3 className={cn(
+                          "font-semibold mb-1",
+                          displayCandidates.length > 0 ? "text-blue-900" : "text-yellow-900"
+                        )}>
+                          {displayCandidates.length > 0 ? "Search Results" : "No Results Found"}
+                        </h3>
+                        <p className={cn(
+                          "text-sm",
+                          displayCandidates.length > 0 ? "text-blue-700" : "text-yellow-700"
+                        )}>
+                          {displayCandidates.length > 0 
+                            ? `Showing results for: "${searchQuery}" (${displayCandidates.length} candidate${displayCandidates.length !== 1 ? 's' : ''} found)`
+                            : `No candidates found for: "${searchQuery}". Try adjusting your search criteria.`
+                          }
+                        </p>
+                        <button
+                          onClick={() => {
+                            router.push('/admin/dashboard')
+                            setSearchQuery('')
+                          }}
+                          className={cn(
+                            "text-xs hover:underline mt-2 underline",
+                            displayCandidates.length > 0 
+                              ? "text-blue-600 hover:text-blue-800" 
+                              : "text-yellow-600 hover:text-yellow-800"
+                          )}
+                        >
+                          Clear search and show all candidates
+                        </button>
+                      </div>
                     </div>
+                  )}
+                  <SectionCards candidates={displayCandidates} />
+                  <div className="px-4 lg:px-6">
+                    <ChartAreaInteractive candidates={displayCandidates} />
                   </div>
-                )}
-                <SectionCards candidates={displayCandidates} />
-                <div className="px-4 lg:px-6">
-                  <ChartAreaInteractive candidates={displayCandidates} />
+                  <DataTable data={displayCandidates} />
                 </div>
-                <DataTable data={displayCandidates} />
               </div>
             </div>
-          </div>
-        </SidebarInset>
-        <FloatingChat onNavigate={handleNavigation} />
-      </SidebarProvider>
-    </div>
+          </SidebarInset>
+          <FloatingChat onNavigate={handleNavigation} />
+        </SidebarProvider>
+      </div>
+    </>
+  )
+}
+
+export default function Page() {
+  return (
+    <AuthGuard requireAuth={true}>
+      <DashboardPage />
+    </AuthGuard>
   )
 }
