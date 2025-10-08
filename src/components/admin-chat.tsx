@@ -513,16 +513,6 @@ export function AdminChat({
               <MessageCircle className="w-5 h-5" />
               Chat with {candidateName}
             </CardTitle>
-            <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm">
-                <Phone className="w-4 h-4 mr-2" />
-                Call
-              </Button>
-              <Button variant="outline" size="sm">
-                <Video className="w-4 h-4 mr-2" />
-                Video
-              </Button>
-            </div>
           </div>
         </CardHeader>
 

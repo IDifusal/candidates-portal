@@ -369,17 +369,17 @@ export default function TalentChatPage() {
               </Badge>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 ">
               <div className="flex items-center space-x-2">
-                <Briefcase className="w-4 h-4 text-gray-500" />
+                <Briefcase className="w-4 h-4 " />
                 <span className="text-sm font-medium">{mockJobInfo.title}</span>
               </div>
               <div className="flex items-center space-x-2">
-                <MapPin className="w-4 h-4 text-gray-500" />
+                <MapPin className="w-4 h-4 text-black" />
                 <span className="text-sm">{mockJobInfo.location}</span>
               </div>
               <div className="flex items-center space-x-2">
-                <DollarSign className="w-4 h-4 text-gray-500" />
+                <DollarSign className="w-4 h-4 text-black" />
                 <span className="text-sm">{mockJobInfo.salary}</span>
               </div>
               <div className="flex items-center space-x-2">
@@ -421,16 +421,6 @@ export default function TalentChatPage() {
                   </div>
                 </div>
                 
-                <div className="space-y-2">
-                  <Button variant="outline" size="sm" className="w-full justify-start">
-                    <Phone className="w-4 h-4 mr-2" />
-                    Quick Call
-                  </Button>
-                  <Button variant="outline" size="sm" className="w-full justify-start">
-                    <Video className="w-4 h-4 mr-2" />
-                    Video Chat
-                  </Button>
-                </div>
               </CardContent>
             </Card>
 
